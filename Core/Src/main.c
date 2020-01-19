@@ -135,7 +135,7 @@ int main(void)
 	}
 	  if(huart2.RxXferCount > count)
 		  count=huart2.RxXferCount;*/
-	  HAL_Delay(1000);
+	  HAL_Delay(100);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
