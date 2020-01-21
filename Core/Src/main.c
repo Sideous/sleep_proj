@@ -57,14 +57,19 @@ DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
 int count=0;
+TIM_OC_InitTypeDef TIM1_sConfigOC = {0};
+TIM_OC_InitTypeDef TIM3_sConfigOC = {0};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void MX_TIM1_Init(void);
-static void MX_TIM3_Init(void);
+//was static void MX_TIM1_Init(void);
+static void MX_TIM1_Init(TIM_OC_InitTypeDef *sConfigOC); //jvm
+//was static void MX_TIM3_Init(void);
+static void MX_TIM3_Init(TIM_OC_InitTypeDef *sConfigOC);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void application_handling(char *cmd);
@@ -115,8 +120,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_TIM1_Init();
-  MX_TIM3_Init();
+
+  //TIM3_sConfigOC ={0};
+  //was MX_TIM1_Init();
+  MX_TIM1_Init(&TIM1_sConfigOC);
+  //was MX_TIM3_Init();
+  MX_TIM3_Init(&TIM1_sConfigOC);
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2 );
@@ -138,15 +147,7 @@ int main(void)
   while (1)
   {	HAL_Delay(100);
 	process_keystroke();
-	/*
-	if(rxBuf[count] != '\0')
-	{	echo_ptr=rxBuf+count;
-		HAL_UART_Transmit(&huart2,(uint8_t *)echo_ptr,1,10);
-			count++;
-	}
-	  if(huart2.RxXferCount > count)
-		  count=huart2.RxXferCount;*/
-	  HAL_Delay(100);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -197,6 +198,126 @@ void SystemClock_Config(void)
   }
 }
 
+/** customized by jvm to require a pointer to sConfig
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(TIM_OC_InitTypeDef *sConfigOC)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+//move to be global separate for TIM1 & 3  TIM_OC_InitTypeDef sConfigOC = {0};
+  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 17000;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 5000;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  sConfigOC->OCMode = TIM_OCMODE_PWM1;
+  sConfigOC->Pulse = 1000;
+  sConfigOC->OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC->OCNPolarity = TIM_OCNPOLARITY_HIGH;
+  sConfigOC->OCFastMode = TIM_OCFAST_DISABLE;
+  sConfigOC->OCIdleState = TIM_OCIDLESTATE_RESET;
+  sConfigOC->OCNIdleState = TIM_OCNIDLESTATE_RESET;
+  //jvm was if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim1, sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
+  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
+  sBreakDeadTimeConfig.DeadTime = 0;
+  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
+  HAL_TIM_MspPostInit(&htim1);
+
+}
+
+
+/**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+
+static void MX_TIM3_Init(TIM_OC_InitTypeDef *sConfigOC)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  //jvm TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 16000;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 5000;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC->OCMode = TIM_OCMODE_PWM1;
+  sConfigOC->Pulse = 1400;
+  sConfigOC->OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC->OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
+
+}
+
+
+#if 0
 /**
   * @brief TIM1 Initialization Function
   * @param None
@@ -262,11 +383,13 @@ static void MX_TIM1_Init(void)
 
 }
 
+
 /**
   * @brief TIM3 Initialization Function
   * @param None
   * @retval None
   */
+
 static void MX_TIM3_Init(void)
 {
 
@@ -311,6 +434,7 @@ static void MX_TIM3_Init(void)
 
 }
 
+#endif
 /**
   * @brief USART2 Initialization Function
   * @param None
@@ -451,33 +575,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 //resets index for echo
 	memset(rxBuf,'\0', sizeof(rxBuf));
 	count=0;
- // 	for(int t=0; t<25; t++)
- // 		rxBuf[t]='\0';
 
-
-	// * 1 #
-//	//Check the command msg
-//	if(rxBuf[0] == '*' && rxBuf[2] == '#')  //A valid command
-//	{
-//		//If commmand is = 0, Turn LED OFF
-//		if(rxBuf[1] == 0)
-//		{
-//			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-//			printf("LED Turned OFF\r\n");
-//		}
-//		//If commmand is = 1, Turn LED ON
-//		else if(rxBuf[1] == 1)
-//		{
-//			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-//			printf("LED Turned ON\r\n");
-//		}
-//		else
-//		{
-//			printf("Invalid Command!\r\n");
-//		}
-//	}
-
-//	HAL_UART_Receive_DMA(&huart2, (uint8_t *)rxBuf, 3);
 }
 
 
