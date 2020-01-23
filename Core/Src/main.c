@@ -66,6 +66,7 @@ TIM_OC_InitTypeDef TIM3_sConfigOC = {0};
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
+static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, int dc);
 //was static void MX_TIM1_Init(void);
 static void MX_TIM1_Init(TIM_OC_InitTypeDef *sConfigOC); //jvm
 //was static void MX_TIM3_Init(void);
@@ -630,6 +631,8 @@ void process_keystroke()
 	}
 
 }
+static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, int dc)
+{}
 /* USER CODE END 4 */
 
 /**
