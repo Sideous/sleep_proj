@@ -125,7 +125,7 @@ int main(void)
   //was MX_TIM1_Init();
   MX_TIM1_Init(&TIM1_sConfigOC);
   //was MX_TIM3_Init();
-  MX_TIM3_Init(&TIM1_sConfigOC);
+  MX_TIM3_Init(&TIM3_sConfigOC);
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2 );
