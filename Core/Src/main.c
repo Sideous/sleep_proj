@@ -66,7 +66,7 @@ TIM_OC_InitTypeDef TIM3_sConfigOC = {0};
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, int dc);
+static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, double dc);
 //was static void MX_TIM1_Init(void);
 static void MX_TIM1_Init(TIM_OC_InitTypeDef *sConfigOC); //jvm
 //was static void MX_TIM3_Init(void);
@@ -631,33 +631,17 @@ void process_keystroke()
 	}
 
 }
-static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, int dc)
+static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, double dc)
 {
-	 /* USER CODE END TIM3_Init 1 */
-	  htim3.Instance = TIM3;
-	  htim3.Init.Prescaler = 16000;
-	  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-	  htim3.Init.Period = 5000;
-	  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-	  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-	  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
-	  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-	  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-	  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
-	  sConfigOC->OCMode = TIM_OCMODE_PWM1;
-	  sConfigOC->Pulse = 1400;
-	  sConfigOC->OCPolarity = TIM_OCPOLARITY_HIGH;
-	  sConfigOC->OCFastMode = TIM_OCFAST_DISABLE;
-	  if (HAL_TIM_PWM_ConfigChannel(&htim3, sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
+
+//	  htim->Init.Period = 5000;
+	if(dc < 1.0)
+	{ 	  sConfigOC->Pulse =(uint32_t) dc*htim->Init.Period;
+		  if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+		  {
+			Error_Handler();
+		  }
+	}
 }
 /* USER CODE END 4 */
 
