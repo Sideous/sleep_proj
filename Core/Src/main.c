@@ -66,7 +66,7 @@ TIM_OC_InitTypeDef TIM3_sConfigOC = {0};
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, double dc);
+
 //was static void MX_TIM1_Init(void);
 static void MX_TIM1_Init(TIM_OC_InitTypeDef *sConfigOC); //jvm
 //was static void MX_TIM3_Init(void);
@@ -75,6 +75,8 @@ static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void application_handling(char *cmd);
 void process_keystroke();
+static void pump_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc);
+static void heater_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -597,6 +599,28 @@ void application_handling(char *cmd)
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 		printf("LED Turned OFF\r\n");
 	}
+	else if(strstr(cmd, "pump") != NULL)
+	{	char * ptr;
+		int dc;
+		ptr = strtok(cmd," ");
+		ptr = strtok(NULL," ");
+		dc= atoi(ptr);
+
+		/*
+		 char str[] ="- This, a sample string.";
+		  char * pch;
+		  printf ("Splitting string \"%s\" into tokens:\n",str);
+		  pch = strtok (str," ,.-");
+		  while (pch != NULL)
+		  {
+		    printf ("%s\n",pch);
+		    pch = strtok (NULL, " ,.-");
+		  }
+		*/
+		pump_duty_cycle(&TIM1_sConfigOC, dc);
+		printf("Pump duty cycle is %i\r\n", dc);
+	}
+//	static void heater_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc);
 	else
 	{
 		//Invalid command
@@ -631,17 +655,25 @@ void process_keystroke()
 	}
 
 }
-static void set_pulse_duty_cycle(TIM_HandleTypeDef *htim,TIM_OC_InitTypeDef *sConfigOC, double dc)
+static void pump_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc)
 {
+	  sConfigOC->Pulse = htim1.Init.Period * dc / 100;
 
-//	  htim->Init.Period = 5000;
-	if(dc < 1.0)
-	{ 	  sConfigOC->Pulse =(uint32_t) dc*htim->Init.Period;
-		  if (HAL_TIM_PWM_ConfigChannel(&htim, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-		  {
-			Error_Handler();
-		  }
-	}
+	  if (HAL_TIM_PWM_ConfigChannel(&htim1, sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+
+}
+static void heater_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc)
+{
+	  sConfigOC->Pulse = htim3.Init.Period * dc / 100;
+
+	  if (HAL_TIM_PWM_ConfigChannel(&htim3, sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+
 }
 /* USER CODE END 4 */
 

@@ -2,4 +2,9 @@
 Debug/
 Drivers/
 *.launch
-
+*.o
+*.su
+*.bin
+*.elf
+*.list
+*.map
