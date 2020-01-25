@@ -40,8 +40,8 @@ sleep_proj.bin \
 all: sleep_proj.elf secondary-outputs
 
 # Tool invocations
-sleep_proj.elf: $(OBJS) $(USER_OBJS) C:\Users\jen\STM32CubeIDE\workspace_1.1.0\sleep_proj\STM32F401RETX_FLASH.ld
-	arm-none-eabi-gcc -o "sleep_proj.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\jen\STM32CubeIDE\workspace_1.1.0\sleep_proj\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="sleep_proj.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+sleep_proj.elf: $(OBJS) $(USER_OBJS) C:\Users\John\STM32CubeIDE\workspace_1.1.0\sleep_proj\STM32F401RETX_FLASH.ld
+	arm-none-eabi-gcc -o "sleep_proj.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\John\STM32CubeIDE\workspace_1.1.0\sleep_proj\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="sleep_proj.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
