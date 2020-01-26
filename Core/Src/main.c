@@ -69,9 +69,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 
-//was static void MX_TIM1_Init(void);
 static void MX_TIM1_Init(TIM_OC_InitTypeDef *sConfigOC); //jvm
-//was static void MX_TIM3_Init(void);
 static void MX_TIM3_Init(TIM_OC_InitTypeDef *sConfigOC);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
