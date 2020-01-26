@@ -547,23 +547,36 @@ void process_keystroke()
 }
 static void pump_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc)
 {
-	  sConfigOC->Pulse = htim1.Init.Period * dc / 100;
+	if(dc >= 0 && dc <=100)
+	{
+		sConfigOC->Pulse = htim1.Init.Period * dc / 100;
 
 	  if (HAL_TIM_PWM_ConfigChannel(&htim1, sConfigOC, TIM_CHANNEL_2) != HAL_OK)
 	  {
 	    Error_Handler();
 	  }
-
+	  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2 );
+	}
+	else
+	{
+		printf("Duty cycle must be from 0 to 100%%, DC requested is-> %i%%\r\n", dc);
+	}
 }
 static void heater_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc)
 {
-	  sConfigOC->Pulse = htim3.Init.Period * dc / 100;
+	if(dc >= 0 && dc <=100)
+	{	sConfigOC->Pulse = htim3.Init.Period * dc / 100;
 
 	  if (HAL_TIM_PWM_ConfigChannel(&htim3, sConfigOC, TIM_CHANNEL_1) != HAL_OK)
 	  {
 	    Error_Handler();
 	  }
-
+	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+	}
+	else
+	{
+		printf("Duty cycle must be from 0 to 100%%, DC requested is-> %i%%\r\n", dc);
+	}
 }
 /* USER CODE END 4 */
 
