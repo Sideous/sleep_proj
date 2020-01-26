@@ -26,6 +26,7 @@
 #include <stdio.h>  //printf
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -471,11 +472,12 @@ void application_handling(char *entered_cmd)
 {	char * arg[5];
 	char cmd[25];
 	strcpy(cmd,entered_cmd);
-
+	for(int k=0; k<15; k++)
+		*(entered_cmd+k)=toupper(*(entered_cmd+k));
 	int dc;
 	arg[0] = strtok(entered_cmd," ");
 	for(int k=1; k<5; k++)
-	{	arg[k]= strtok(NULL," ");
+	{	arg[k]= strtok(NULL," ,\r");
 		if(arg[k] == NULL)
 		{ 	k--;
 			break;
@@ -483,29 +485,30 @@ void application_handling(char *entered_cmd)
 	}
 
 
-
-
-
-	if(strstr(cmd, "LED ON") != NULL)
+	if(!strcmp(arg[0], "LED"))
 	{
-		//Turn LED ON (GPIOA, GPIO_PIN_5);
-		//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-		printf("LED Turned ON\r\n");
+		if(!strcmp(arg[1], "ON"))
+		{
+			//Turn LED ON (GPIOA, GPIO_PIN_5);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+			printf("LED Turned ON\r\n");
+		}
+		else if(!strcmp(arg[1], "OFF"))
+		{	//Turn LED OFF
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+			printf("LED Turned OFF\r\n");
+		}
+		else
+		{	//Invalid command
+			printf("Invalid Command!\r\n");
+		}
 	}
-	else if(strstr(cmd, "LED OFF") != NULL)
-	{
-		//Turn LED OFF
-		//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-		printf("LED Turned OFF\r\n");
-	}
-	else if(!strcmp(arg[0], "pump"))//(strstr(cmd, "pump") != NULL)
+	else if(!strcmp(arg[0], "PUMP"))//(strstr(cmd, "pump") != NULL)
 	{	dc= atoi(arg[1]);
 		pump_duty_cycle(&TIM1_sConfigOC, dc);
 		printf("Pump duty cycle is %i%%\r\n", dc);
 	}
-	else if(!strcmp(arg[0], "heater"))//(strstr(cmd, "pump") != NULL)
+	else if(!strcmp(arg[0], "HEATER"))//(strstr(cmd, "pump") != NULL)
 	{	dc= atoi(arg[1]);
 		heater_duty_cycle(&TIM3_sConfigOC, dc);
 		printf("Heater duty cycle is %i%%\r\n", dc);
