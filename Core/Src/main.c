@@ -139,7 +139,7 @@ int main(void)
 
 	//** Fixed size command of 3 bytes *[]#, Initialise
 	//HAL_UART_Receive_DMA(&huart2, (uint8_t *)rxBuf, 21);	//3); //
-	HAL_UART_Receive_DMA(&huart2, (uint8_t *)rxBuf, 9); //dma return
+	HAL_UART_Receive_DMA(&huart2, (uint8_t *)rxBuf, 15); //dma return
 
 
   /* USER CODE END 2 */
@@ -467,8 +467,25 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 
 //UART Application handling function
-void application_handling(char *cmd)
-{
+void application_handling(char *entered_cmd)
+{	char * arg[5];
+	char cmd[25];
+	strcpy(cmd,entered_cmd);
+
+	int dc;
+	arg[0] = strtok(entered_cmd," ");
+	for(int k=1; k<5; k++)
+	{	arg[k]= strtok(NULL," ");
+		if(arg[k] == NULL)
+		{ 	k--;
+			break;
+		}
+	}
+
+
+
+
+
 	if(strstr(cmd, "LED ON") != NULL)
 	{
 		//Turn LED ON (GPIOA, GPIO_PIN_5);
@@ -483,32 +500,16 @@ void application_handling(char *cmd)
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 		printf("LED Turned OFF\r\n");
 	}
-	else if(strstr(cmd, "pump") != NULL)
-	{	char * ptr;
-		char * arg[5];
-
-		int dc;
-		ptr = strtok(cmd," ");
-		arg[0]=ptr;
-		ptr = strtok(NULL," ");
-		arg[1]=ptr;
-		//dc= atoi(ptr);
-		dc= atoi(arg[1]);
-		/*
-		 char str[] ="- This, a sample string.";
-		  char * pch;
-		  printf ("Splitting string \"%s\" into tokens:\n",str);
-		  pch = strtok (str," ,.-");
-		  while (pch != NULL)
-		  {
-		    printf ("%s\n",pch);
-		    pch = strtok (NULL, " ,.-");
-		  }
-		*/
+	else if(!strcmp(arg[0], "pump"))//(strstr(cmd, "pump") != NULL)
+	{	dc= atoi(arg[1]);
 		pump_duty_cycle(&TIM1_sConfigOC, dc);
 		printf("Pump duty cycle is %i%%\r\n", dc);
 	}
-//	static void heater_duty_cycle(TIM_OC_InitTypeDef *sConfigOC, int dc);
+	else if(!strcmp(arg[0], "heater"))//(strstr(cmd, "pump") != NULL)
+	{	dc= atoi(arg[1]);
+		heater_duty_cycle(&TIM3_sConfigOC, dc);
+		printf("Heater duty cycle is %i%%\r\n", dc);
+	}
 	else
 	{
 		//Invalid command
@@ -536,7 +537,7 @@ void process_keystroke()
 			//HAL_UART_Receive_DMA(&huart2, (uint8_t *)rxBuf, 7); //dma return
 			memset(rxBuf,'\0', sizeof(rxBuf));
 			count=0;
-			HAL_UART_Receive_DMA(&huart2, (uint8_t *)rxBuf, 9);
+			HAL_UART_Receive_DMA(&huart2, (uint8_t *)rxBuf, 15);
 		}
 		else
 			count++;
