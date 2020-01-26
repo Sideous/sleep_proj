@@ -1,6 +1,7 @@
 #ignore
 Debug/
 Drivers/
+Core/Startup
 *.launch
 *.o
 *.su
